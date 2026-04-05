@@ -3,464 +3,928 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>葬祭事務 日報入力フォーム</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>業務日報</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .time-slot { transition: all 0.2s ease; }
-        .time-slot:hover { background-color: #f0f9ff; }
-        .time-slot.active { background-color: #dbeafe; border-left: 4px solid #0ea5e9; }
-        .export-btn { transition: all 0.3s ease; }
-        .export-btn:hover { transform: translateY(-2px); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 32px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0e0e0;
+            color: #333;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .todo-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .todo-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px 80px;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .todo-item select {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .todo-item input {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .todo-item input[type="date"] {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .btn-remove-todo {
+            padding: 8px 12px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-remove-todo:hover {
+            background-color: #ff5252;
+        }
+
+        .btn-add-todo {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-add-todo:hover {
+            background-color: #357abd;
+        }
+
+        .time-slots {
+            display: grid;
+            gap: 16px;
+        }
+
+        .time-slot {
+            display: grid;
+            grid-template-columns: 80px 150px 200px 150px 150px;
+            gap: 12px;
+            align-items: start;
+            padding: 16px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .time-label {
+            font-weight: 600;
+            color: #333;
+            padding-top: 8px;
+        }
+
+        .time-slot input,
+        .time-slot select {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            padding-top: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #1e8449;
+        }
+
+        .btn-danger {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #ff5252;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 32px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 16px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background-color: #f0f0f0;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .time-slot {
+                grid-template-columns: 1fr;
+            }
+
+            .todo-item {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
+    <div class="container">
+        <h1>業務日報</h1>
+        <p class="subtitle">30分単位で業務内容を記録</p>
 
-<!-- ヘッダー -->
-<div class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-    <div class="max-w-2xl mx-auto px-4 py-4">
-        <h1 class="text-2xl font-bold text-gray-800">葬祭事務 日報入力</h1>
-        <p class="text-sm text-gray-500 mt-1">30分単位で業務内容を記録</p>
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- ヘッダー情報セクション -->
+        <div class="section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="reportDate">報告日</label>
+                    <input type="date" id="reportDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeName">氏名</label>
+                    <input type="text" id="employeeName" placeholder="">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="department">所属部署</label>
+                    <select id="department">
+                        <option value="">選択してください</option>
+                        <option value="事務">事務</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="attendanceType">出勤区分</label>
+                    <select id="attendanceType">
+                        <option value="">選択してください</option>
+                        <option value="通常">通常勤務</option>
+                        <option value="短縮">短縮勤務</option>
+                        <option value="半日">半日勤務</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="manager">管理者</label>
+                    <input type="text" id="manager" placeholder="確認者名">
+                </div>
+            </div>
+        </div>
+
+        <!-- 本日のTODOセクション -->
+        <div class="section">
+            <div class="section-title">本日のTODO</div>
+            <div class="todo-section" id="todoList">
+                <div class="todo-item">
+                    <select class="todo-priority">
+                        <option value="優先">優先</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
+                    <input type="text" class="todo-text" placeholder="TODO項目を入力">
+                    <input type="date" class="todo-deadline">
+                    <button class="btn-remove-todo" onclick="removeTodoItem(this)">削除</button>
+                </div>
+            </div>
+            <button class="btn-add-todo" onclick="addTodoItem()">+ TODO追加</button>
+        </div>
+
+        <!-- 実行業務記録セクション -->
+        <div class="section">
+            <div class="section-title">実行業務記録 9:00-18:00（30分単位）</div>
+            <div class="time-slots" id="timeSlots">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+        </div>
+
+        <!-- ボタングループ -->
+        <div class="button-group">
+            <button class="btn btn-success" onclick="saveReport()">💾 保存</button>
+            <button class="btn btn-primary" onclick="viewSavedData()">📋 保存データを確認</button>
+            <button class="btn btn-secondary" onclick="exportCSV()">📊 CSV出力</button>
+            <button class="btn btn-danger" onclick="clearForm()">🗑️ クリア</button>
+        </div>
     </div>
-</div>
 
-<!-- メインコンテナ -->
-<div class="max-w-2xl mx-auto px-4 py-6">
-
-    <!-- ヘッダー情報セクション -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">報告日</label>
-                <input type="date" id="reportDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <!-- データ確認モーダル -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>保存データ一覧</h2>
+                <button class="close-btn" onclick="closeDataModal()">&times;</button>
             </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">氏名</label>
-                <input type="text" id="userName" placeholder="例：太郎" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">出勤区分</label>
-                <select id="attendanceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">選択してください</option>
-                    <option value="通常">通常勤務</option>
-                    <option value="短縮">短縮勤務</option>
-                    <option value="半日">半日勤務</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">管理者</label>
-                <input type="text" id="managerName" placeholder="確認者名" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="dataList">
+                <!-- 動的に生成 -->
             </div>
         </div>
     </div>
 
-    <!-- TODO入力セクション -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">本日のTODO</h2>
-        <div id="todoList" class="space-y-3">
-            <div class="flex gap-2">
-                <select class="flex-shrink-0 px-2 py-1 border border-gray-300 rounded text-sm bg-white">
-                    <option value="高">高</option>
+    <script>
+        // ===== 定数 =====
+        const STORAGE_KEY = 'dailyReports';
+        const CATEGORY_OPTIONS = [
+            '遺族相談・受付',
+            '見積・提案作成',
+            '契約・書類処理',
+            '支払・決算処理',
+            '返礼品・ギフト手配',
+            '火葬場・式場調整',
+            '備品・在庫管理',
+            '会議・ミーティング',
+            '事務作業（その他）'
+        ];
+
+        // ===== 初期化 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            initReportDate();
+            generateTimeSlots();
+            loadDraft();
+        });
+
+        /**
+         * 報告日を今日の日付で初期化
+         */
+        function initReportDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
+        }
+
+        /**
+         * 30分単位の時間スロットを生成（9:00-18:00 = 18行）
+         */
+        function generateTimeSlots() {
+            const container = document.getElementById('timeSlots');
+            container.innerHTML = '';
+
+            let hour = 9, minute = 0;
+            for (let i = 0; i < 18; i++) {
+                const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+                const html = `
+                    <div class="time-slot">
+                        <div class="time-label">${timeStr}</div>
+                        <div class="form-group" style="margin: 0;">
+                            <label style="margin-bottom: 4px;">業務内容</label>
+                            <select class="activity-category" data-time="${timeStr}">
+                                <option value="">選択</option>
+                                ${CATEGORY_OPTIONS.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label style="margin-bottom: 4px;">業務内容詳細</label>
+                            <input type="text" class="activity-detail" placeholder="詳細を記入" data-time="${timeStr}">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label style="margin-bottom: 4px;">TODO時点</label>
+                            <input type="text" class="activity-plan" placeholder="予定" data-time="${timeStr}">
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="activity-completed" data-time="${timeStr}">
+                            <label>完了</label>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+
+                minute += 30;
+                if (minute === 60) {
+                    minute = 0;
+                    hour++;
+                }
+            }
+        }
+
+        /**
+         * TODOアイテムを追加
+         */
+        function addTodoItem() {
+            const todoList = document.getElementById('todoList');
+            const newItem = document.createElement('div');
+            newItem.className = 'todo-item';
+            newItem.innerHTML = `
+                <select class="todo-priority">
+                    <option value="優先">優先</option>
                     <option value="中">中</option>
                     <option value="低">低</option>
                 </select>
-                <input type="text" placeholder="TODO項目を入力" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="removeTodo(this)" class="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">削除</button>
-            </div>
-        </div>
-        <button onclick="addTodo()" class="mt-4 w-full px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 transition">+ TODO追加</button>
-    </div>
-
-    <!-- 業務カテゴリ定義（折りたたみ） -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <button onclick="toggleCategories()" class="w-full flex justify-between items-center text-lg font-bold text-gray-800 pb-2 border-b">
-            <span>業務カテゴリ設定</span>
-            <span id="categoryToggleIcon" class="text-2xl">▼</span>
-        </button>
-        <div id="categoryPanel" class="hidden mt-4">
-            <p class="text-sm text-gray-600 mb-3">カテゴリを行ごとに編集（改行区切り）</p>
-            <textarea id="categoryList" class="w-full h-32 p-3 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="遺族相談・受付&#10;見積・提案作成&#10;契約・書類処理&#10;...">遺族相談・受付
-見積・提案作成
-契約・書類処理
-支払・決算処理
-返礼品・ギフト手配
-火葬場・式場調整
-備品・在庫管理
-会議・ミーティング
-事務作業（その他）</textarea>
-            <button onclick="saveCategories()" class="mt-2 w-full px-3 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200 transition">カテゴリ保存</button>
-        </div>
-    </div>
-
-    <!-- 実行業務記録セクション -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">実行業務記録 9:00-18:00</h2>
-        <div id="timeSlots" class="space-y-2">
-            <!-- JavaScriptで動的に生成 -->
-        </div>
-    </div>
-
-    <!-- 所感セクション -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">本日の所感・気づき</h2>
-        <textarea id="impression" placeholder="本日の振り返り、気づきなどを記入" class="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-    </div>
-
-    <!-- 管理者確認セクション -->
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-4 mb-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">管理者確認欄</h2>
-        <div class="mb-3">
-            <label class="inline-flex items-center">
-                <input type="checkbox" id="managerApproval" class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="ml-2 text-sm font-medium text-gray-700">承認</span>
-            </label>
-        </div>
-        <textarea id="managerFeedback" placeholder="フィードバック記入欄" class="w-full h-16 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-    </div>
-
-    <!-- アクションボタン -->
-    <div class="flex flex-col gap-3 mb-8">
-        <button onclick="saveToDraft()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition export-btn">💾 ローカルに保存</button>
-        <button onclick="exportToCSV()" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition export-btn">📊 CSVでエクスポート</button>
-        <button onclick="clearForm()" class="w-full px-4 py-3 bg-gray-400 text-white rounded-lg font-bold hover:bg-gray-500 transition">🗑️ クリア</button>
-    </div>
-
-    <!-- ステータスメッセージ -->
-    <div id="statusMessage" class="hidden fixed bottom-4 right-4 px-4 py-3 bg-green-500 text-white rounded-lg shadow-lg text-sm font-medium"></div>
-
-</div>
-
-<script>
-// ===== グローバル変数 =====
-let timeSlots = [];
-
-// ===== 初期化 =====
-document.addEventListener('DOMContentLoaded', () => {
-    initReportDate();
-    generateTimeSlots();
-    loadDraft();
-});
-
-/**
- * 報告日を今日の日付で初期化
- */
-function initReportDate() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('reportDate').value = today;
-}
-
-/**
- * 30分単位の時間スロットを生成（9:00-18:00 = 18行）
- */
-function generateTimeSlots() {
-    const container = document.getElementById('timeSlots');
-    container.innerHTML = '';
-    timeSlots = [];
-    
-    let hour = 9, minute = 0;
-    for (let i = 0; i < 18; i++) {
-        const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-        const slotId = `slot-${i}`;
-        
-        const slot = {
-            id: slotId,
-            time: timeStr,
-            plan: '',
-            activity: '',
-            category: '',
-            completed: false
-        };
-        timeSlots.push(slot);
-        
-        const html = `
-            <div class="time-slot border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-md" id="${slotId}">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600">時刻</label>
-                        <div class="font-mono text-lg font-bold text-gray-800">${timeStr}</div>
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600">TODO時点</label>
-                        <input type="text" class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="予定" data-field="plan">
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600">実行内容</label>
-                        <input type="text" class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="業務内容" data-field="activity">
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600">カテゴリ</label>
-                        <select class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" data-field="category">
-                            <option value="">選択</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-1 focus:ring-blue-400" data-field="completed">
-                            <span class="ml-1 text-xs font-semibold text-gray-600">完了</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        `;
-        container.innerHTML += html;
-        
-        minute += 30;
-        if (minute === 60) {
-            minute = 0;
-            hour++;
-        }
-    }
-    
-    populateCategories();
-    attachSlotListeners();
-}
-
-/**
- * 各時間スロットのインプット値変更をリスナーに接続
- */
-function attachSlotListeners() {
-    document.querySelectorAll('.time-slot').forEach((slot, idx) => {
-        const inputs = slot.querySelectorAll('[data-field]');
-        inputs.forEach(inp => {
-            inp.addEventListener('change', () => {
-                const field = inp.getAttribute('data-field');
-                if (field === 'completed') {
-                    timeSlots[idx][field] = inp.checked;
-                } else {
-                    timeSlots[idx][field] = inp.value;
-                }
-            });
-            inp.addEventListener('input', () => {
-                const field = inp.getAttribute('data-field');
-                if (field !== 'completed') {
-                    timeSlots[idx][field] = inp.value;
-                }
-            });
-        });
-    });
-}
-
-/**
- * カテゴリドロップダウンに選択肢を追加
- */
-function populateCategories() {
-    const cats = document.getElementById('categoryList').value.split('\n').filter(c => c.trim());
-    document.querySelectorAll('[data-field="category"]').forEach(select => {
-        select.innerHTML = '<option value="">選択</option>' + 
-            cats.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
-    });
-}
-
-/**
- * カテゴリ折りたたみ切り替え
- */
-function toggleCategories() {
-    const panel = document.getElementById('categoryPanel');
-    const icon = document.getElementById('categoryToggleIcon');
-    panel.classList.toggle('hidden');
-    icon.textContent = panel.classList.contains('hidden') ? '▼' : '▲';
-}
-
-/**
- * カテゴリ保存＋再生成
- */
-function saveCategories() {
-    localStorage.setItem('categories', document.getElementById('categoryList').value);
-    populateCategories();
-    showStatus('✓ カテゴリを保存しました');
-}
-
-/**
- * TODO追加
- */
-function addTodo() {
-    const list = document.getElementById('todoList');
-    const newTodo = document.createElement('div');
-    newTodo.className = 'flex gap-2';
-    newTodo.innerHTML = `
-        <select class="flex-shrink-0 px-2 py-1 border border-gray-300 rounded text-sm bg-white">
-            <option value="高">高</option>
-            <option value="中">中</option>
-            <option value="低">低</option>
-        </select>
-        <input type="text" placeholder="TODO項目を入力" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button onclick="removeTodo(this)" class="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">削除</button>
-    `;
-    list.appendChild(newTodo);
-}
-
-/**
- * TODO削除
- */
-function removeTodo(btn) {
-    btn.parentElement.remove();
-}
-
-/**
- * ローカルストレージに保存
- */
-function saveToDraft() {
-    const data = {
-        date: document.getElementById('reportDate').value,
-        userName: document.getElementById('userName').value,
-        attendance: document.getElementById('attendanceType').value,
-        manager: document.getElementById('managerName').value,
-        todos: Array.from(document.getElementById('todoList').children).map(row => ({
-            priority: row.querySelector('select').value,
-            text: row.querySelector('input[type="text"]').value
-        })),
-        timeSlots: timeSlots,
-        impression: document.getElementById('impression').value,
-        managerApproval: document.getElementById('managerApproval').checked,
-        managerFeedback: document.getElementById('managerFeedback').value
-    };
-    localStorage.setItem('draftReport', JSON.stringify(data));
-    showStatus('✓ ドラフトを保存しました');
-}
-
-/**
- * ドラフトを読み込み
- */
-function loadDraft() {
-    const draft = localStorage.getItem('draftReport');
-    if (!draft) return;
-    
-    const data = JSON.parse(draft);
-    document.getElementById('reportDate').value = data.date || '';
-    document.getElementById('userName').value = data.userName || '';
-    document.getElementById('attendanceType').value = data.attendance || '';
-    document.getElementById('managerName').value = data.manager || '';
-    document.getElementById('impression').value = data.impression || '';
-    document.getElementById('managerApproval').checked = data.managerApproval || false;
-    document.getElementById('managerFeedback').value = data.managerFeedback || '';
-    
-    // TODO復元
-    const todoList = document.getElementById('todoList');
-    todoList.innerHTML = '';
-    if (data.todos && data.todos.length > 0) {
-        data.todos.forEach(todo => {
-            const div = document.createElement('div');
-            div.className = 'flex gap-2';
-            div.innerHTML = `
-                <select class="flex-shrink-0 px-2 py-1 border border-gray-300 rounded text-sm bg-white">
-                    <option value="高" ${todo.priority === '高' ? 'selected' : ''}>高</option>
-                    <option value="中" ${todo.priority === '中' ? 'selected' : ''}>中</option>
-                    <option value="低" ${todo.priority === '低' ? 'selected' : ''}>低</option>
-                </select>
-                <input type="text" placeholder="TODO項目を入力" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" value="${todo.text}">
-                <button onclick="removeTodo(this)" class="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">削除</button>
+                <input type="text" class="todo-text" placeholder="TODO項目を入力">
+                <input type="date" class="todo-deadline">
+                <button class="btn-remove-todo" onclick="removeTodoItem(this)">削除</button>
             `;
-            todoList.appendChild(div);
-        });
-    }
-    
-    // 時間スロット復元
-    if (data.timeSlots && data.timeSlots.length > 0) {
-        data.timeSlots.forEach((slot, idx) => {
-            if (idx < timeSlots.length) {
-                timeSlots[idx] = { ...timeSlots[idx], ...slot };
-                const elem = document.getElementById(slot.id);
-                if (elem) {
-                    elem.querySelector('[data-field="plan"]').value = slot.plan || '';
-                    elem.querySelector('[data-field="activity"]').value = slot.activity || '';
-                    elem.querySelector('[data-field="category"]').value = slot.category || '';
-                    elem.querySelector('[data-field="completed"]').checked = slot.completed || false;
+            todoList.appendChild(newItem);
+        }
+
+        /**
+         * TODOアイテムを削除
+         */
+        function removeTodoItem(btn) {
+            btn.parentElement.remove();
+        }
+
+        /**
+         * 報告書を保存
+         */
+        function saveReport() {
+            // フォーム値を収集
+            const report = {
+                id: Date.now(),
+                date: document.getElementById('reportDate').value,
+                employeeName: document.getElementById('employeeName').value,
+                department: document.getElementById('department').value,
+                attendanceType: document.getElementById('attendanceType').value,
+                manager: document.getElementById('manager').value,
+                todos: collectTodos(),
+                timeSlots: collectTimeSlots(),
+                savedAt: new Date().toLocaleString('ja-JP')
+            };
+
+            // バリデーション
+            if (!report.date) {
+                showStatus('報告日を入力してください', 'error');
+                return;
+            }
+
+            // LocalStorageに保存
+            let reports = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            reports.push(report);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+
+            // ドラフトをクリア
+            localStorage.removeItem('draftReport');
+
+            showStatus('✓ 報告書を保存しました', 'success');
+            clearForm();
+        }
+
+        /**
+         * TODOデータを収集
+         */
+        function collectTodos() {
+            const todos = [];
+            document.querySelectorAll('.todo-item').forEach(item => {
+                const priority = item.querySelector('.todo-priority').value;
+                const text = item.querySelector('.todo-text').value;
+                const deadline = item.querySelector('.todo-deadline').value;
+
+                if (text) {
+                    todos.push({ priority, text, deadline });
                 }
+            });
+            return todos;
+        }
+
+        /**
+         * 時間スロットデータを収集
+         */
+        function collectTimeSlots() {
+            const slots = [];
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                const time = slot.querySelector('.activity-category').getAttribute('data-time');
+                const category = slot.querySelector('.activity-category').value;
+                const detail = slot.querySelector('.activity-detail').value;
+                const plan = slot.querySelector('.activity-plan').value;
+                const completed = slot.querySelector('.activity-completed').checked;
+
+                if (category || detail || plan) {
+                    slots.push({ time, category, detail, plan, completed });
+                }
+            });
+            return slots;
+        }
+
+        /**
+         * ドラフトを自動保存（入力中に定期的に呼び出し）
+         */
+        function saveDraft() {
+            const draft = {
+                date: document.getElementById('reportDate').value,
+                employeeName: document.getElementById('employeeName').value,
+                department: document.getElementById('department').value,
+                attendanceType: document.getElementById('attendanceType').value,
+                manager: document.getElementById('manager').value,
+                todos: collectTodos(),
+                timeSlots: collectTimeSlots()
+            };
+            localStorage.setItem('draftReport', JSON.stringify(draft));
+        }
+
+        /**
+         * ドラフトを読み込み
+         */
+        function loadDraft() {
+            const draft = localStorage.getItem('draftReport');
+            if (!draft) return;
+
+            const data = JSON.parse(draft);
+            document.getElementById('reportDate').value = data.date || '';
+            document.getElementById('employeeName').value = data.employeeName || '';
+            document.getElementById('department').value = data.department || '';
+            document.getElementById('attendanceType').value = data.attendanceType || '';
+            document.getElementById('manager').value = data.manager || '';
+
+            // TODOを復元
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+            if (data.todos && data.todos.length > 0) {
+                data.todos.forEach(todo => {
+                    const div = document.createElement('div');
+                    div.className = 'todo-item';
+                    div.innerHTML = `
+                        <select class="todo-priority">
+                            <option value="優先" ${todo.priority === '優先' ? 'selected' : ''}>優先</option>
+                            <option value="中" ${todo.priority === '中' ? 'selected' : ''}>中</option>
+                            <option value="低" ${todo.priority === '低' ? 'selected' : ''}>低</option>
+                        </select>
+                        <input type="text" class="todo-text" placeholder="TODO項目を入力" value="${todo.text || ''}">
+                        <input type="date" class="todo-deadline" value="${todo.deadline || ''}">
+                        <button class="btn-remove-todo" onclick="removeTodoItem(this)">削除</button>
+                    `;
+                    todoList.appendChild(div);
+                });
+            } else {
+                const div = document.createElement('div');
+                div.className = 'todo-item';
+                div.innerHTML = `
+                    <select class="todo-priority">
+                        <option value="優先">優先</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
+                    <input type="text" class="todo-text" placeholder="TODO項目を入力">
+                    <input type="date" class="todo-deadline">
+                    <button class="btn-remove-todo" onclick="removeTodoItem(this)">削除</button>
+                `;
+                todoList.appendChild(div);
+            }
+
+            // 時間スロットを復元
+            if (data.timeSlots && data.timeSlots.length > 0) {
+                data.timeSlots.forEach(slot => {
+                    const slotElem = document.querySelector(`[data-time="${slot.time}"]`).closest('.time-slot');
+                    if (slotElem) {
+                        slotElem.querySelector('.activity-category').value = slot.category || '';
+                        slotElem.querySelector('.activity-detail').value = slot.detail || '';
+                        slotElem.querySelector('.activity-plan').value = slot.plan || '';
+                        slotElem.querySelector('.activity-completed').checked = slot.completed || false;
+                    }
+                });
+            }
+        }
+
+        /**
+         * 保存されたデータを表示
+         */
+        function viewSavedData() {
+            const reports = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const dataList = document.getElementById('dataList');
+
+            if (reports.length === 0) {
+                dataList.innerHTML = '<div class="empty-state"><p>保存されたデータはありません</p></div>';
+            } else {
+                let html = '<table class="data-table"><thead><tr><th>報告日</th><th>氏名</th><th>所属部署</th><th>出勤区分</th><th>保存日時</th><th>操作</th></tr></thead><tbody>';
+
+                reports.forEach((report, idx) => {
+                    html += `
+                        <tr>
+                            <td>${report.date}</td>
+                            <td>${report.employeeName || '-'}</td>
+                            <td>${report.department || '-'}</td>
+                            <td>${report.attendanceType || '-'}</td>
+                            <td>${report.savedAt}</td>
+                            <td>
+                                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteReport(${idx})">削除</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                dataList.innerHTML = html;
+            }
+
+            document.getElementById('dataModal').classList.add('show');
+        }
+
+        /**
+         * データモーダルを閉じる
+         */
+        function closeDataModal() {
+            document.getElementById('dataModal').classList.remove('show');
+        }
+
+        /**
+         * 報告書を削除
+         */
+        function deleteReport(idx) {
+            if (!confirm('このデータを削除しますか？')) return;
+
+            let reports = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            reports.splice(idx, 1);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+
+            showStatus('✓ データを削除しました', 'success');
+            viewSavedData();
+        }
+
+        /**
+         * CSV形式でエクスポート
+         */
+        function exportCSV() {
+            const reports = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+            if (reports.length === 0) {
+                showStatus('エクスポートするデータがありません', 'error');
+                return;
+            }
+
+            let csv = '報告日,氏名,所属部署,出勤区分,管理者,時刻,業務内容,業務内容詳細,TODO時点,完了,保存日時\n';
+
+            reports.forEach(report => {
+                if (report.timeSlots && report.timeSlots.length > 0) {
+                    report.timeSlots.forEach(slot => {
+                        const row = [
+                            report.date,
+                            report.employeeName || '',
+                            report.department || '',
+                            report.attendanceType || '',
+                            report.manager || '',
+                            slot.time,
+                            slot.category || '',
+                            slot.detail || '',
+                            slot.plan || '',
+                            slot.completed ? '✓' : '',
+                            report.savedAt
+                        ];
+                        csv += row.map(col => `"${String(col).replace(/"/g, '""')}"`).join(',') + '\n';
+                    });
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `業務日報_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showStatus('✓ CSV形式でエクスポートしました', 'success');
+        }
+
+        /**
+         * フォームをクリア
+         */
+        function clearForm() {
+            if (!confirm('すべての入力内容をクリアしますか？')) return;
+
+            document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('employeeName').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('attendanceType').value = '';
+            document.getElementById('manager').value = '';
+
+            // TODOをリセット
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = `
+                <div class="todo-item">
+                    <select class="todo-priority">
+                        <option value="優先">優先</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
+                    <input type="text" class="todo-text" placeholder="TODO項目を入力">
+                    <input type="date" class="todo-deadline">
+                    <button class="btn-remove-todo" onclick="removeTodoItem(this)">削除</button>
+                </div>
+            `;
+
+            // 時間スロットをリセット
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.querySelector('.activity-category').value = '';
+                slot.querySelector('.activity-detail').value = '';
+                slot.querySelector('.activity-plan').value = '';
+                slot.querySelector('.activity-completed').checked = false;
+            });
+
+            localStorage.removeItem('draftReport');
+            showStatus('✓ フォームをクリアしました', 'success');
+        }
+
+        /**
+         * ステータスメッセージを表示
+         */
+        function showStatus(message, type = 'success') {
+            const msg = document.getElementById('statusMessage');
+            msg.textContent = message;
+            msg.className = `status-message ${type}`;
+            msg.style.display = 'block';
+
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+
+        /**
+         * 入力変更時にドラフトを保存（デバウンス）
+         */
+        let draftTimeout;
+        document.addEventListener('input', () => {
+            clearTimeout(draftTimeout);
+            draftTimeout = setTimeout(saveDraft, 1000);
+        });
+
+        document.addEventListener('change', () => {
+            saveDraft();
+        });
+
+        // モーダルの外側をクリックで閉じる
+        document.getElementById('dataModal').addEventListener('click', (e) => {
+            if (e.target.id === 'dataModal') {
+                closeDataModal();
             }
         });
-    }
-}
-
-/**
- * フォームをクリア
- */
-function clearForm() {
-    if (!confirm('すべての入力内容をクリアしますか？')) return;
-    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('userName').value = '';
-    document.getElementById('attendanceType').value = '';
-    document.getElementById('managerName').value = '';
-    document.getElementById('impression').value = '';
-    document.getElementById('managerApproval').checked = false;
-    document.getElementById('managerFeedback').value = '';
-    
-    document.getElementById('todoList').innerHTML = `
-        <div class="flex gap-2">
-            <select class="flex-shrink-0 px-2 py-1 border border-gray-300 rounded text-sm bg-white">
-                <option value="高">高</option>
-                <option value="中">中</option>
-                <option value="低">低</option>
-            </select>
-            <input type="text" placeholder="TODO項目を入力" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="removeTodo(this)" class="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">削除</button>
-        </div>
-    `;
-    
-    document.querySelectorAll('[data-field="plan"]').forEach(inp => inp.value = '');
-    document.querySelectorAll('[data-field="activity"]').forEach(inp => inp.value = '');
-    document.querySelectorAll('[data-field="category"]').forEach(inp => inp.value = '');
-    document.querySelectorAll('[data-field="completed"]').forEach(inp => inp.checked = false);
-    
-    showStatus('✓ フォームをクリアしました');
-}
-
-/**
- * CSV形式でエクスポート
- * Excelで開きやすいカンマ区切り形式
- */
-function exportToCSV() {
-    saveToDraft();
-    
-    const date = document.getElementById('reportDate').value;
-    const userName = document.getElementById('userName').value;
-    const attendance = document.getElementById('attendanceType').value;
-    
-    // CSVヘッダー
-    let csv = '報告日,氏名,出勤区分,時刻,TODO時点,実行内容,業務カテゴリ,完了\n';
-    
-    // 時間スロットデータ
-    timeSlots.forEach(slot => {
-        // CSV用にダブルクォーテーション処理
-        const escape = (str) => {
-            if (str && (str.includes(',') || str.includes('"') || str.includes('\n'))) {
-                return '"' + str.replace(/"/g, '""') + '"';
-            }
-            return str || '';
-        };
-        
-        csv += `${escape(date)},${escape(userName)},${escape(attendance)},${escape(slot.time)},${escape(slot.plan)},${escape(slot.activity)},${escape(slot.category)},${slot.completed ? '✓' : ''}\n`;
-    });
-    
-    // CSV をダウンロード
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `日報_${userName}_${date}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    showStatus('✓ CSV形式でエクスポートしました（Excelで開く際は「UTF-8 BOM」を選択）');
-}
-
-/**
- * ステータスメッセージ表示
- */
-function showStatus(message) {
-    const msg = document.getElementById('statusMessage');
-    msg.textContent = message;
-    msg.classList.remove('hidden');
-    setTimeout(() => msg.classList.add('hidden'), 3000);
-}
-
-// カテゴリ読み込み
-const savedCats = localStorage.getItem('categories');
-if (savedCats) {
-    document.getElementById('categoryList').value = savedCats;
-}
-</script>
-
+    </script>
 </body>
 </html>
