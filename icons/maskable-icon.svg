@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="個別スケジュール">
+  <rect width="512" height="512" fill="#2f6f5e"/>
+  <rect x="82" y="106" width="348" height="320" rx="42" fill="#ffffff"/>
+  <rect x="82" y="106" width="348" height="88" rx="42" fill="#194e43"/>
+  <rect x="132" y="72" width="38" height="92" rx="19" fill="#ffffff"/>
+  <rect x="342" y="72" width="38" height="92" rx="19" fill="#ffffff"/>
+  <g fill="#dfe5df">
+    <rect x="130" y="238" width="58" height="48" rx="12"/>
+    <rect x="227" y="238" width="58" height="48" rx="12"/>
+    <rect x="324" y="238" width="58" height="48" rx="12"/>
+    <rect x="130" y="320" width="58" height="48" rx="12"/>
+    <rect x="227" y="320" width="58" height="48" rx="12"/>
+  </g>
+  <rect x="324" y="320" width="58" height="48" rx="12" fill="#b36a1f"/>
+</svg>
