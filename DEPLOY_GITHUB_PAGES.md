@@ -30,6 +30,14 @@ personal-schedule-pwa
 
 GitHubの画面に表示される `owner/repo` に合わせて、下のURLを置き換えて実行します。
 
+簡単に実行する場合:
+
+```powershell
+.\publish_to_github_pages.ps1 -RepositoryUrl "https://github.com/YOUR_NAME/personal-schedule-pwa.git"
+```
+
+手動で実行する場合:
+
 ```powershell
 git remote add origin https://github.com/YOUR_NAME/personal-schedule-pwa.git
 git branch -M main
