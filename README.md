@@ -37,6 +37,12 @@ npm.cmd run start
 
 GitHub PagesでHTTPS公開する手順は [DEPLOY_GITHUB_PAGES.md](./DEPLOY_GITHUB_PAGES.md) を見てください。
 
+指定リポジトリで公開した場合のURL:
+
+```text
+https://nishi-asuka.github.io/daily-report/
+```
+
 構文チェック:
 
 ```powershell

@@ -16,7 +16,7 @@ GitHubで新しいリポジトリを作成します。
 推奨名:
 
 ```text
-personal-schedule-pwa
+daily-report
 ```
 
 設定:
@@ -33,13 +33,13 @@ GitHubの画面に表示される `owner/repo` に合わせて、下のURLを置
 簡単に実行する場合:
 
 ```powershell
-.\publish_to_github_pages.ps1 -RepositoryUrl "https://github.com/YOUR_NAME/personal-schedule-pwa.git"
+.\publish_to_github_pages.ps1 -RepositoryUrl "https://github.com/nishi-asuka/daily-report.git"
 ```
 
 手動で実行する場合:
 
 ```powershell
-git remote add origin https://github.com/YOUR_NAME/personal-schedule-pwa.git
+git remote add origin https://github.com/nishi-asuka/daily-report.git
 git branch -M main
 git push -u origin main
 ```
@@ -58,7 +58,7 @@ GitHubのリポジトリ画面で:
 数分後、次のようなURLが発行されます。
 
 ```text
-https://YOUR_NAME.github.io/personal-schedule-pwa/
+https://nishi-asuka.github.io/daily-report/
 ```
 
 ## 4. スマホのホーム画面に追加
