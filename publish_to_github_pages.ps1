@@ -48,6 +48,25 @@ if ($status) {
   Invoke-RepoGit commit -m "Update personal schedule PWA"
 }
 
+$remoteMain = & git -c "safe.directory=$SafeRepoPath" ls-remote --heads origin main
+if ($LASTEXITCODE -ne 0) {
+  throw "git remote check failed. Please confirm the repository URL and GitHub authentication."
+}
+
+if ($remoteMain) {
+  Invoke-RepoGit fetch origin main
+
+  & git -c "safe.directory=$SafeRepoPath" merge-base HEAD origin/main *> $null
+  if ($LASTEXITCODE -eq 0) {
+    & git -c "safe.directory=$SafeRepoPath" merge-base --is-ancestor origin/main HEAD
+    if ($LASTEXITCODE -ne 0) {
+      Invoke-RepoGit rebase origin/main
+    }
+  } else {
+    Invoke-RepoGit merge --allow-unrelated-histories --no-edit origin/main
+  }
+}
+
 Invoke-RepoGit push -u origin main
 
 Write-Host ""
