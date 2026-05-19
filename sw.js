@@ -1,4 +1,4 @@
-const CACHE_NAME = "personal-schedule-v1";
+const CACHE_NAME = "personal-schedule-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,9 @@ const APP_SHELL = [
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon.svg",
+  "./icons/icon-180.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
   "./icons/maskable-icon.svg"
 ];
 
