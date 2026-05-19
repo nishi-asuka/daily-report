@@ -357,10 +357,19 @@ h3 {
   color: var(--primary-dark);
 }
 
-.filter-grid,
 .field-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field-row > label:only-child {
+  grid-column: 1 / -1;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
@@ -396,14 +405,22 @@ label textarea {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 0 2px;
-  color: var(--muted);
-  font-size: 13px;
+  padding: 3px 2px 1px;
+  color: var(--ink);
   font-weight: 800;
 }
 
+.date-label {
+  font-size: 20px;
+  line-height: 1.25;
+}
+
 .date-heading small {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--surface-soft);
   color: var(--primary-dark);
+  padding: 5px 9px;
   font-size: 12px;
 }
 
@@ -418,21 +435,38 @@ label textarea {
   box-shadow: 0 10px 28px rgba(26, 45, 37, 0.07);
 }
 
-.event-item.priority-high {
-  border-left-color: var(--red);
-  background: linear-gradient(90deg, rgba(185, 71, 62, 0.07), #fff 32%);
+.event-item.category-travel {
+  border-left-color: #356c9b;
+  background: linear-gradient(90deg, rgba(53, 108, 155, 0.08), #fff 34%);
 }
 
-.event-item.priority-low {
-  border-left-color: var(--blue);
+.event-item.category-visitor {
+  border-left-color: #2f6f5e;
+  background: linear-gradient(90deg, rgba(47, 111, 94, 0.08), #fff 34%);
 }
 
-.event-item.status-done {
-  opacity: 0.7;
+.event-item.category-meal {
+  border-left-color: #b56d24;
+  background: linear-gradient(90deg, rgba(181, 109, 36, 0.09), #fff 34%);
 }
 
-.event-item.status-done .event-title {
-  text-decoration: line-through;
+.event-item.category-lecturer {
+  border-left-color: #6d6095;
+  background: linear-gradient(90deg, rgba(109, 96, 149, 0.09), #fff 34%);
+}
+
+.event-item.category-off {
+  border-left-color: #60745a;
+  background: linear-gradient(90deg, rgba(96, 116, 90, 0.09), #fff 34%);
+}
+
+.event-item.category-use {
+  border-left-color: #b9473e;
+  background: linear-gradient(90deg, rgba(185, 71, 62, 0.08), #fff 34%);
+}
+
+.event-item.category-other {
+  border-left-color: #78847d;
 }
 
 .event-main {
@@ -450,7 +484,10 @@ label textarea {
   font-weight: 900;
 }
 
-.event-status {
+.event-category {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8px;
   flex: 0 0 auto;
   border-radius: 999px;
   background: var(--surface-soft);
@@ -470,47 +507,55 @@ label textarea {
 
 .event-meta {
   margin-top: 7px;
+  border-radius: 8px;
+  background: rgba(238, 245, 240, 0.68);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.55;
   overflow-wrap: anywhere;
+  padding: 8px 10px;
 }
 
-.event-flags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 9px;
-}
-
-.flag-tag {
-  border-radius: 999px;
-  background: #eef3ee;
-  color: var(--muted);
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.flag-tag.reply,
-.flag-tag.precheck {
-  background: #fff0ed;
-  color: var(--red);
-}
-
-.flag-tag.share {
+.category-travel .event-category,
+.chip.travel {
   background: #edf3fb;
-  color: var(--blue);
+  color: #2a5e8c;
 }
 
-.flag-tag.report {
-  background: #fff4e5;
-  color: var(--amber);
+.category-visitor .event-category,
+.chip.visitor {
+  background: #eef5f0;
+  color: #1d5146;
 }
 
-.flag-tag.gcal {
-  background: #eef4f8;
-  color: var(--blue);
+.category-meal .event-category,
+.chip.meal {
+  background: #fff3e4;
+  color: #8c551d;
+}
+
+.category-lecturer .event-category,
+.chip.lecturer {
+  background: #f0eef8;
+  color: #5a4f7d;
+}
+
+.category-off .event-category,
+.chip.off {
+  background: #eef3ec;
+  color: #4f634a;
+}
+
+.category-use .event-category,
+.chip.use {
+  background: #fff0ed;
+  color: #9b3a33;
+}
+
+.category-other .event-category,
+.chip.other {
+  background: #f1f3f1;
+  color: #5f6963;
 }
 
 .event-actions {
@@ -617,33 +662,6 @@ label textarea {
   white-space: nowrap;
 }
 
-.chip.customer {
-  background: #eef5f0;
-  color: var(--primary-dark);
-}
-
-.chip.staff,
-.chip.personal {
-  background: #f0eef8;
-  color: var(--violet);
-}
-
-.chip.branch,
-.chip.admin {
-  background: #fff3e4;
-  color: var(--amber);
-}
-
-.chip.system {
-  background: #edf3fb;
-  color: var(--blue);
-}
-
-.chip.report {
-  background: #fff0ed;
-  color: var(--red);
-}
-
 form {
   display: grid;
   gap: 12px;
@@ -663,61 +681,9 @@ form {
   font-size: 14px;
 }
 
-.checkbox-line input,
-.flag-fieldset input {
+.checkbox-line input {
   width: auto;
   min-height: 0;
-}
-
-.detail-fields {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfcfb;
-  padding: 10px;
-}
-
-.detail-fields summary {
-  color: var(--primary-dark);
-  cursor: pointer;
-  font-weight: 900;
-}
-
-.detail-fields[open] {
-  display: grid;
-  gap: 11px;
-}
-
-.detail-fields[open] summary {
-  margin-bottom: 4px;
-}
-
-.flag-fieldset {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  border: 0;
-  padding: 0;
-}
-
-.flag-fieldset legend {
-  width: 100%;
-  margin-bottom: 2px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.flag-fieldset label {
-  display: flex;
-  align-items: center;
-  width: auto;
-  min-height: 36px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  padding: 0 10px;
-  color: var(--ink);
-  font-size: 13px;
 }
 
 .save-button {

@@ -1,55 +1,14 @@
-const STORAGE_KEY = "personal-schedule-events-v2";
-const LEGACY_STORAGE_KEY = "personal-schedule-events-v1";
+const STORAGE_KEY = "personal-schedule-events-v3";
+const LEGACY_STORAGE_KEYS = ["personal-schedule-events-v2", "personal-schedule-events-v1"];
 
 const categoryLabels = {
-  customer: "顧客対応",
-  staff: "スタッフ対応",
-  branch: "店舗/式場",
-  admin: "事務処理",
-  system: "kintone/システム",
-  report: "日報/振り返り",
-  personal: "私用"
-};
-
-const typeLabels = {
-  meeting: "打合せ",
-  visit: "訪問",
-  call: "電話/連絡",
-  work: "作業",
-  check: "確認",
-  travel: "移動",
-  deadline: "締切",
-  off: "休み"
-};
-
-const statusLabels = {
-  scheduled: "予定",
-  tentative: "仮予定",
-  active: "対応中",
-  done: "完了",
-  hold: "保留",
-  postponed: "延期/キャンセル"
-};
-
-const priorityLabels = {
-  high: "高",
-  normal: "通常",
-  low: "低"
-};
-
-const roleLabels = {
-  owner: "主担当",
-  support: "同行/補助",
-  reviewer: "確認者",
-  share: "共有のみ"
-};
-
-const flagLabels = {
-  reply: "要返信",
-  precheck: "要事前確認",
-  share: "要共有",
-  report: "日報",
-  gcal: "GCal済"
+  travel: "出張",
+  visitor: "来客",
+  meal: "食事会",
+  lecturer: "外部講師",
+  off: "休み",
+  use: "使用",
+  other: "その他"
 };
 
 const state = {
@@ -59,7 +18,6 @@ const state = {
   activeView: "list",
   period: "upcoming",
   categoryFilter: "all",
-  statusFilter: "all",
   search: ""
 };
 
@@ -74,29 +32,20 @@ const els = {
   eventId: document.querySelector("#eventId"),
   titleInput: document.querySelector("#titleInput"),
   dateInput: document.querySelector("#dateInput"),
-  assigneeInput: document.querySelector("#assigneeInput"),
   allDayInput: document.querySelector("#allDayInput"),
   startInput: document.querySelector("#startInput"),
   endInput: document.querySelector("#endInput"),
   categoryInput: document.querySelector("#categoryInput"),
-  eventTypeInput: document.querySelector("#eventTypeInput"),
-  statusInput: document.querySelector("#statusInput"),
-  priorityInput: document.querySelector("#priorityInput"),
-  roleInput: document.querySelector("#roleInput"),
-  branchInput: document.querySelector("#branchInput"),
-  projectInput: document.querySelector("#projectInput"),
-  locationInput: document.querySelector("#locationInput"),
   notesInput: document.querySelector("#notesInput"),
   quickMemo: document.querySelector("#quickMemo"),
   conflictWarning: document.querySelector("#conflictWarning"),
   cancelEditButton: document.querySelector("#cancelEditButton"),
   searchInput: document.querySelector("#searchInput"),
   filterCategoryInput: document.querySelector("#filterCategoryInput"),
-  filterStatusInput: document.querySelector("#filterStatusInput"),
   todayCount: document.querySelector("#todayCount"),
-  reportCount: document.querySelector("#reportCount"),
-  highCount: document.querySelector("#highCount"),
-  checkCount: document.querySelector("#checkCount"),
+  tomorrowCount: document.querySelector("#tomorrowCount"),
+  weekCount: document.querySelector("#weekCount"),
+  upcomingCount: document.querySelector("#upcomingCount"),
   eventTemplate: document.querySelector("#eventTemplate")
 };
 
@@ -142,8 +91,6 @@ function bindEvents() {
       end: parsed.end,
       allDay: !parsed.start,
       category: parsed.category,
-      eventType: parsed.eventType,
-      flags: parsed.flags,
       notes: els.quickMemo.value.trim()
     });
     setActiveView("form");
@@ -157,7 +104,7 @@ function bindEvents() {
 
   els.cancelEditButton.addEventListener("click", () => resetForm({ date: state.selectedDate }));
 
-  [els.dateInput, els.assigneeInput, els.startInput, els.endInput, els.allDayInput].forEach((input) => {
+  [els.dateInput, els.startInput, els.endInput, els.allDayInput].forEach((input) => {
     input.addEventListener("input", updateConflictWarning);
   });
 
@@ -179,11 +126,6 @@ function bindEvents() {
 
   els.filterCategoryInput.addEventListener("change", () => {
     state.categoryFilter = els.filterCategoryInput.value;
-    renderList();
-  });
-
-  els.filterStatusInput.addEventListener("change", () => {
-    state.statusFilter = els.filterStatusInput.value;
     renderList();
   });
 
@@ -244,10 +186,12 @@ function render() {
 
 function renderStats() {
   const today = toDateKey(new Date());
-  els.todayCount.textContent = state.events.filter((item) => item.date === today && item.status !== "done").length;
-  els.checkCount.textContent = state.events.filter((item) => hasCheckFlag(item) && item.status !== "done").length;
-  els.highCount.textContent = state.events.filter((item) => item.priority === "high" && item.status !== "done").length;
-  els.reportCount.textContent = state.events.filter((item) => item.flags.includes("report")).length;
+  const tomorrow = toDateKey(addDays(new Date(), 1));
+  const weekEnd = toDateKey(addDays(new Date(), 7));
+  els.todayCount.textContent = state.events.filter((item) => item.date === today).length;
+  els.tomorrowCount.textContent = state.events.filter((item) => item.date === tomorrow).length;
+  els.weekCount.textContent = state.events.filter((item) => item.date >= today && item.date <= weekEnd).length;
+  els.upcomingCount.textContent = state.events.filter((item) => item.date >= today).length;
 }
 
 function renderList() {
@@ -268,7 +212,7 @@ function renderList() {
     section.className = "date-group";
     section.innerHTML = `
       <div class="date-heading">
-        <span>${formatDateHeading(date)}</span>
+        <span class="date-label">${formatDateHeading(date)}</span>
         <small>${items.length}件</small>
       </div>
       <div class="event-list"></div>
@@ -345,33 +289,14 @@ function renderEventList(container, events) {
 
 function createEventNode(item) {
   const node = els.eventTemplate.content.firstElementChild.cloneNode(true);
-  node.classList.add(`priority-${item.priority}`, `status-${item.status}`);
-  node.querySelector(".event-time").textContent = `${formatTimeRange(item)} ${typeLabels[item.eventType] || ""}`.trim();
-  node.querySelector(".event-status").textContent = statusLabels[item.status] || item.status;
+  node.classList.add(`category-${item.category}`);
+  node.querySelector(".event-time").textContent = formatTimeRange(item);
+  node.querySelector(".event-category").textContent = categoryLabels[item.category] || categoryLabels.other;
   node.querySelector(".event-title").textContent = item.title;
-
-  const meta = [
-    categoryLabels[item.category],
-    item.assignee,
-    roleLabels[item.role],
-    item.branch ? `拠点:${item.branch}` : "",
-    item.project ? `案件:${item.project}` : "",
-    item.location ? `場所:${item.location}` : "",
-    item.priority === "high" ? "高優先" : ""
-  ].filter(Boolean);
-  node.querySelector(".event-meta").textContent = meta.join(" / ");
-
-  const flagWrap = node.querySelector(".event-flags");
-  item.flags.forEach((flag) => {
-    const tag = document.createElement("span");
-    tag.className = `flag-tag ${flag}`;
-    tag.textContent = flagLabels[flag] || flag;
-    flagWrap.appendChild(tag);
-  });
+  node.querySelector(".event-meta").textContent = item.notes || "メモなし";
 
   node.querySelector(".edit-button").addEventListener("click", () => editEvent(item.id));
   node.querySelector(".delete-button").addEventListener("click", () => deleteEvent(item.id));
-  node.querySelector(".done-button").addEventListener("click", () => markDone(item.id));
   return node;
 }
 
@@ -383,15 +308,11 @@ function filteredEvents() {
   return state.events
     .filter((item) => {
       if (state.categoryFilter !== "all" && item.category !== state.categoryFilter) return false;
-      if (state.statusFilter !== "all" && item.status !== state.statusFilter) return false;
       if (!matchesSearch(item)) return false;
       if (state.period === "today") return item.date === today;
       if (state.period === "tomorrow") return item.date === tomorrow;
       if (state.period === "week") return item.date >= today && item.date <= weekEnd;
-      if (state.period === "needs-check") return hasCheckFlag(item);
-      if (state.period === "high") return item.priority === "high";
-      if (state.period === "report") return item.flags.includes("report");
-      return item.date >= today || item.status !== "done";
+      return item.date >= today;
     })
     .sort(sortEvents);
 }
@@ -401,24 +322,15 @@ function saveCurrentForm() {
     id: els.eventId.value || crypto.randomUUID(),
     title: els.titleInput.value.trim(),
     date: els.dateInput.value,
-    assignee: els.assigneeInput.value.trim(),
     allDay: els.allDayInput.checked,
     start: els.allDayInput.checked ? "" : els.startInput.value,
     end: els.allDayInput.checked ? "" : els.endInput.value,
     category: els.categoryInput.value,
-    eventType: els.eventTypeInput.value,
-    status: els.statusInput.value,
-    priority: els.priorityInput.value,
-    role: els.roleInput.value,
-    branch: els.branchInput.value.trim(),
-    project: els.projectInput.value.trim(),
-    location: els.locationInput.value.trim(),
-    flags: selectedFlags(),
     notes: els.notesInput.value.trim(),
     updatedAt: new Date().toISOString()
   };
 
-  if (!event.title || !event.date || !event.assignee) return;
+  if (!event.title || !event.date) return;
   if (!event.allDay && event.start && event.end && event.end < event.start) {
     els.conflictWarning.textContent = "終了時刻が開始時刻より前です。";
     els.conflictWarning.classList.remove("hidden");
@@ -446,20 +358,11 @@ function editEvent(id) {
   els.eventId.value = item.id;
   els.titleInput.value = item.title;
   els.dateInput.value = item.date;
-  els.assigneeInput.value = item.assignee;
   els.allDayInput.checked = item.allDay;
   els.startInput.value = item.start;
   els.endInput.value = item.end;
   els.categoryInput.value = item.category;
-  els.eventTypeInput.value = item.eventType;
-  els.statusInput.value = item.status;
-  els.priorityInput.value = item.priority;
-  els.roleInput.value = item.role;
-  els.branchInput.value = item.branch;
-  els.projectInput.value = item.project;
-  els.locationInput.value = item.location;
   els.notesInput.value = item.notes;
-  setSelectedFlags(item.flags);
   els.cancelEditButton.classList.remove("hidden");
   els.startInput.disabled = item.allDay;
   els.endInput.disabled = item.allDay;
@@ -473,34 +376,16 @@ function deleteEvent(id) {
   render();
 }
 
-function markDone(id) {
-  const item = state.events.find((event) => event.id === id);
-  if (!item) return;
-  item.status = "done";
-  item.updatedAt = new Date().toISOString();
-  persist();
-  render();
-}
-
 function resetForm(overrides = {}) {
   els.eventForm.reset();
   els.eventId.value = "";
   els.titleInput.value = overrides.title || "";
   els.dateInput.value = overrides.date || state.selectedDate;
-  els.assigneeInput.value = overrides.assignee || "自分";
   els.allDayInput.checked = overrides.allDay ?? false;
   els.startInput.value = overrides.start || "";
   els.endInput.value = overrides.end || "";
-  els.categoryInput.value = overrides.category || "customer";
-  els.eventTypeInput.value = overrides.eventType || "meeting";
-  els.statusInput.value = overrides.status || "scheduled";
-  els.priorityInput.value = overrides.priority || "normal";
-  els.roleInput.value = overrides.role || "owner";
-  els.branchInput.value = overrides.branch || "";
-  els.projectInput.value = overrides.project || "";
-  els.locationInput.value = overrides.location || "";
+  els.categoryInput.value = overrides.category || "other";
   els.notesInput.value = overrides.notes || "";
-  setSelectedFlags(overrides.flags || []);
   els.startInput.disabled = els.allDayInput.checked;
   els.endInput.disabled = els.allDayInput.checked;
   els.cancelEditButton.classList.add("hidden");
@@ -511,7 +396,6 @@ function updateConflictWarning() {
   const draft = {
     id: els.eventId.value,
     date: els.dateInput.value,
-    assignee: els.assigneeInput.value.trim(),
     allDay: els.allDayInput.checked,
     start: els.startInput.value,
     end: els.endInput.value
@@ -529,20 +413,9 @@ function findConflicts(draft) {
   if (!draft.date || draft.allDay || !draft.start) return [];
   return state.events.filter((item) => {
     if (item.id === draft.id || item.date !== draft.date || item.allDay || !item.start) return false;
-    if (item.assignee !== draft.assignee) return false;
     const draftEnd = draft.end || draft.start;
     const itemEnd = item.end || item.start;
     return draft.start <= itemEnd && draftEnd >= item.start;
-  });
-}
-
-function selectedFlags() {
-  return Array.from(document.querySelectorAll('input[name="flags"]:checked')).map((input) => input.value);
-}
-
-function setSelectedFlags(flags) {
-  document.querySelectorAll('input[name="flags"]').forEach((input) => {
-    input.checked = flags.includes(input.value);
   });
 }
 
@@ -556,12 +429,8 @@ function sortEvents(a, b) {
 
 function matchesSearch(item) {
   if (!state.search) return true;
-  const haystack = [item.title, item.assignee, item.branch, item.project, item.location, item.notes].join(" ").toLowerCase();
+  const haystack = [item.title, categoryLabels[item.category], item.notes].join(" ").toLowerCase();
   return haystack.includes(state.search);
-}
-
-function hasCheckFlag(item) {
-  return item.flags.some((flag) => ["reply", "precheck", "share"].includes(flag)) || item.status === "hold";
 }
 
 function groupByDate(events) {
@@ -577,9 +446,7 @@ function parseJapaneseMemo(text) {
   const now = new Date();
   let date = state.selectedDate;
   let cleaned = source;
-  let eventType = "meeting";
-  let category = "customer";
-  const flags = [];
+  const category = inferCategoryFromText(source);
 
   if (/明日/.test(cleaned)) {
     date = toDateKey(addDays(now, 1));
@@ -601,51 +468,28 @@ function parseJapaneseMemo(text) {
   const end = start ? addMinutesToTime(start, 60) : "";
   if (timeMatch) cleaned = cleaned.replace(timeMatch[0], "");
 
-  if (/電話|連絡|返信/.test(source)) eventType = "call";
-  if (/訪問|外出|式場|店舗/.test(source)) eventType = "visit";
-  if (/移動/.test(source)) eventType = "travel";
-  if (/締切|期限/.test(source)) eventType = "deadline";
-  if (/確認/.test(source)) eventType = "check";
-  if (/スタッフ|面談|勤務/.test(source)) category = "staff";
-  if (/kintone|システム|アプリ/.test(source)) category = "system";
-  if (/日報|振り返り/.test(source)) category = "report";
-  if (/事務|請求|契約|資料/.test(source)) category = "admin";
-  if (/返信/.test(source)) flags.push("reply");
-  if (/確認/.test(source)) flags.push("precheck");
-  if (/共有/.test(source)) flags.push("share");
-  if (/日報/.test(source)) flags.push("report");
-
   return {
     date,
     start,
     end,
     category,
-    eventType,
-    flags,
     title: cleaned.replace(/\s+/g, " ").trim() || source || "新しい予定"
   };
 }
 
+function inferCategoryFromText(text) {
+  if (/出張|遠方|移動/.test(text)) return "travel";
+  if (/来客|来社|訪問者|お客様/.test(text)) return "visitor";
+  if (/食事|会食|ランチ|夕食|懇親/.test(text)) return "meal";
+  if (/講師|研修|セミナー|勉強会/.test(text)) return "lecturer";
+  if (/休み|休暇|有休|休日/.test(text)) return "off";
+  if (/使用|利用|予約|式場|会議室/.test(text)) return "use";
+  return "other";
+}
+
 function toCsv(events) {
-  const headers = [
-    "date",
-    "start",
-    "end",
-    "allDay",
-    "assignee",
-    "category",
-    "eventType",
-    "status",
-    "priority",
-    "role",
-    "branch",
-    "project",
-    "title",
-    "location",
-    "flags",
-    "notes"
-  ];
-  const rows = [...events].sort(sortEvents).map((item) => headers.map((key) => csvEscape(key === "flags" ? item.flags.join("|") : item[key])).join(","));
+  const headers = ["date", "start", "end", "allDay", "category", "title", "notes"];
+  const rows = [...events].sort(sortEvents).map((item) => headers.map((key) => csvEscape(item[key])).join(","));
   return [headers.join(","), ...rows].join("\r\n");
 }
 
@@ -677,46 +521,28 @@ function importJson(event) {
 
 function normalizeEvent(item) {
   if (!item || !item.title || !item.date) return null;
-  const legacyFlags = [];
-  if (item.status === "needs-check") legacyFlags.push("precheck");
-  if (Array.isArray(item.flags)) legacyFlags.push(...item.flags);
-
+  const legacyMemo = [item.notes, item.location, item.project, item.branch].filter(Boolean).join("\n");
   return {
     id: item.id || crypto.randomUUID(),
     title: String(item.title),
     date: String(item.date),
-    assignee: item.assignee || "自分",
     allDay: Boolean(item.allDay),
     start: item.start || "",
     end: item.end || "",
-    category: mapCategory(item.category),
-    eventType: typeLabels[item.eventType] ? item.eventType : inferEventType(item),
-    status: statusLabels[item.status] ? item.status : item.status === "done" ? "done" : "scheduled",
-    priority: priorityLabels[item.priority] ? item.priority : "normal",
-    role: roleLabels[item.role] ? item.role : "owner",
-    branch: item.branch || "",
-    project: item.project || "",
-    location: item.location || "",
-    flags: [...new Set(legacyFlags.filter((flag) => flagLabels[flag]))],
-    notes: item.notes || "",
+    category: mapCategory(item.category, item.title, legacyMemo),
+    notes: legacyMemo,
     updatedAt: item.updatedAt || new Date().toISOString()
   };
 }
 
-function mapCategory(category) {
+function mapCategory(category, title = "", notes = "") {
   if (categoryLabels[category]) return category;
-  if (category === "meeting") return "customer";
-  if (category === "task" || category === "work") return "admin";
-  if (category === "travel") return "branch";
-  return "customer";
-}
-
-function inferEventType(item) {
-  if (item.category === "travel") return "travel";
-  if (item.category === "task") return "work";
-  if (/電話|連絡|返信/.test(item.title || "")) return "call";
-  if (/締切|期限/.test(item.title || "")) return "deadline";
-  return "meeting";
+  if (category === "travel") return "travel";
+  if (category === "customer" || category === "meeting") return "visitor";
+  if (category === "personal") return "off";
+  if (category === "branch") return "use";
+  const inferred = inferCategoryFromText(`${title} ${notes}`);
+  return inferred === "other" ? "other" : inferred;
 }
 
 function addSampleEvents() {
@@ -726,42 +552,24 @@ function addSampleEvents() {
     ...state.events,
     {
       id: crypto.randomUUID(),
-      title: "朝の優先順位整理",
+      title: "来客対応",
       date: today,
-      assignee: "自分",
       allDay: false,
-      start: "09:00",
-      end: "09:30",
-      category: "report",
-      eventType: "check",
-      status: "scheduled",
-      priority: "high",
-      role: "owner",
-      branch: "事務所",
-      project: "",
-      location: "",
-      flags: ["precheck", "report"],
-      notes: "今日の予定、返信、待ちを確認",
+      start: "10:00",
+      end: "11:00",
+      category: "visitor",
+      notes: "応接室を確認",
       updatedAt: new Date().toISOString()
     },
     {
       id: crypto.randomUUID(),
-      title: "顧客向け提案メモ作成",
+      title: "外部講師との打合せ",
       date: tomorrow,
-      assignee: "自分",
       allDay: false,
       start: "14:00",
       end: "15:00",
-      category: "customer",
-      eventType: "work",
-      status: "scheduled",
-      priority: "normal",
-      role: "owner",
-      branch: "オンライン",
-      project: "提案準備",
-      location: "オンライン",
-      flags: ["share"],
-      notes: "",
+      category: "lecturer",
+      notes: "資料と投影環境を確認",
       updatedAt: new Date().toISOString()
     }
   ];
@@ -782,7 +590,7 @@ function downloadFile(filename, content, type) {
 
 function loadEvents() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY) || "[]";
+    const stored = [STORAGE_KEY, ...LEGACY_STORAGE_KEYS].map((key) => localStorage.getItem(key)).find(Boolean) || "[]";
     const parsed = JSON.parse(stored);
     return Array.isArray(parsed) ? parsed.map(normalizeEvent).filter(Boolean) : [];
   } catch {
@@ -831,7 +639,8 @@ function formatDateHeading(dateKey) {
 function formatTimeRange(item) {
   if (item.allDay) return "終日";
   if (item.start && item.end) return `${item.start}-${item.end}`;
-  return item.start || "";
+  if (item.start) return item.start;
+  return "時間未定";
 }
 
 function addMinutesToTime(time, minutes) {

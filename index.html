@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icons/icon-180.png" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <div class="app-shell">
@@ -50,54 +50,39 @@
               <strong id="todayCount">0</strong>
             </article>
             <article>
-              <span>要確認</span>
-              <strong id="checkCount">0</strong>
+              <span>明日</span>
+              <strong id="tomorrowCount">0</strong>
             </article>
             <article>
-              <span>高優先</span>
-              <strong id="highCount">0</strong>
+              <span>今週</span>
+              <strong id="weekCount">0</strong>
             </article>
             <article>
-              <span>日報</span>
-              <strong id="reportCount">0</strong>
+              <span>今後</span>
+              <strong id="upcomingCount">0</strong>
             </article>
           </section>
 
           <section class="panel list-controls" aria-label="絞り込み">
-            <input id="searchInput" type="search" placeholder="件名・顧客・拠点・メモで検索" />
+            <input id="searchInput" type="search" placeholder="件名・メモで検索" />
             <div class="quick-filters" aria-label="期間と確認">
               <button class="filter-chip is-active" type="button" data-period="upcoming">今後</button>
               <button class="filter-chip" type="button" data-period="today">今日</button>
               <button class="filter-chip" type="button" data-period="tomorrow">明日</button>
               <button class="filter-chip" type="button" data-period="week">今週</button>
-              <button class="filter-chip" type="button" data-period="needs-check">要確認</button>
-              <button class="filter-chip" type="button" data-period="high">高優先</button>
-              <button class="filter-chip" type="button" data-period="report">日報</button>
             </div>
             <div class="filter-grid">
               <label>
                 <span>カテゴリ</span>
                 <select id="filterCategoryInput">
                   <option value="all">すべて</option>
-                  <option value="customer">顧客対応</option>
-                  <option value="staff">スタッフ対応</option>
-                  <option value="branch">店舗/式場</option>
-                  <option value="admin">事務処理</option>
-                  <option value="system">kintone/システム</option>
-                  <option value="report">日報/振り返り</option>
-                  <option value="personal">私用</option>
-                </select>
-              </label>
-              <label>
-                <span>ステータス</span>
-                <select id="filterStatusInput">
-                  <option value="all">すべて</option>
-                  <option value="scheduled">予定</option>
-                  <option value="tentative">仮予定</option>
-                  <option value="active">対応中</option>
-                  <option value="done">完了</option>
-                  <option value="hold">保留</option>
-                  <option value="postponed">延期/キャンセル</option>
+                  <option value="travel">出張</option>
+                  <option value="visitor">来客</option>
+                  <option value="meal">食事会</option>
+                  <option value="lecturer">外部講師</option>
+                  <option value="off">休み</option>
+                  <option value="use">使用</option>
+                  <option value="other">その他</option>
                 </select>
               </label>
             </div>
@@ -154,7 +139,7 @@
               <h3 id="quick-title">メモから作成</h3>
               <button class="ghost-button" id="parseMemoButton" type="button">抽出</button>
             </div>
-            <textarea id="quickMemo" rows="3" placeholder="明日14時 〇〇店でスタッフ面談、日報に記載"></textarea>
+            <textarea id="quickMemo" rows="3" placeholder="明日14時 来客対応、応接室を確認"></textarea>
           </section>
 
           <section class="panel">
@@ -169,10 +154,6 @@
                 <label>
                   <span>日付</span>
                   <input id="dateInput" type="date" required />
-                </label>
-                <label>
-                  <span>担当者</span>
-                  <input id="assigneeInput" type="text" required maxlength="40" />
                 </label>
               </div>
 
@@ -196,90 +177,16 @@
                 <label>
                   <span>カテゴリ</span>
                   <select id="categoryInput">
-                    <option value="customer">顧客対応</option>
-                    <option value="staff">スタッフ対応</option>
-                    <option value="branch">店舗/式場</option>
-                    <option value="admin">事務処理</option>
-                    <option value="system">kintone/システム</option>
-                    <option value="report">日報/振り返り</option>
-                    <option value="personal">私用</option>
-                  </select>
-                </label>
-                <label>
-                  <span>予定種別</span>
-                  <select id="eventTypeInput">
-                    <option value="meeting">打合せ</option>
-                    <option value="visit">訪問</option>
-                    <option value="call">電話/連絡</option>
-                    <option value="work">作業</option>
-                    <option value="check">確認</option>
-                    <option value="travel">移動</option>
-                    <option value="deadline">締切</option>
+                    <option value="travel">出張</option>
+                    <option value="visitor">来客</option>
+                    <option value="meal">食事会</option>
+                    <option value="lecturer">外部講師</option>
                     <option value="off">休み</option>
+                    <option value="use">使用</option>
+                    <option value="other">その他</option>
                   </select>
                 </label>
               </div>
-
-              <div class="field-row">
-                <label>
-                  <span>ステータス</span>
-                  <select id="statusInput">
-                    <option value="scheduled">予定</option>
-                    <option value="tentative">仮予定</option>
-                    <option value="active">対応中</option>
-                    <option value="done">完了</option>
-                    <option value="hold">保留</option>
-                    <option value="postponed">延期/キャンセル</option>
-                  </select>
-                </label>
-                <label>
-                  <span>優先度</span>
-                  <select id="priorityInput">
-                    <option value="high">高</option>
-                    <option value="normal" selected>通常</option>
-                    <option value="low">低</option>
-                  </select>
-                </label>
-              </div>
-
-              <details class="detail-fields" open>
-                <summary>業務メモ</summary>
-                <div class="field-row">
-                  <label>
-                    <span>自分の役割</span>
-                    <select id="roleInput">
-                      <option value="owner">主担当</option>
-                      <option value="support">同行/補助</option>
-                      <option value="reviewer">確認者</option>
-                      <option value="share">共有のみ</option>
-                    </select>
-                  </label>
-                  <label>
-                    <span>拠点/店舗</span>
-                    <input id="branchInput" type="text" maxlength="80" placeholder="例：〇〇店、オンライン" />
-                  </label>
-                </div>
-
-                <div class="field-row">
-                  <label>
-                    <span>顧客/案件</span>
-                    <input id="projectInput" type="text" maxlength="80" placeholder="例：会社名、案件名" />
-                  </label>
-                  <label>
-                    <span>場所</span>
-                    <input id="locationInput" type="text" maxlength="80" placeholder="例：事務所、式場、Zoom" />
-                  </label>
-                </div>
-
-                <fieldset class="flag-fieldset">
-                  <legend>確認フラグ</legend>
-                  <label><input type="checkbox" name="flags" value="reply" />要返信</label>
-                  <label><input type="checkbox" name="flags" value="precheck" />要事前確認</label>
-                  <label><input type="checkbox" name="flags" value="share" />要共有</label>
-                  <label><input type="checkbox" name="flags" value="report" />日報に記載</label>
-                  <label><input type="checkbox" name="flags" value="gcal" />Google Calendar反映済み</label>
-                </fieldset>
-              </details>
 
               <label class="field-full">
                 <span>メモ</span>
@@ -321,20 +228,18 @@
         <div class="event-main">
           <div class="event-line">
             <span class="event-time"></span>
-            <span class="event-status"></span>
           </div>
           <strong class="event-title"></strong>
+          <span class="event-category"></span>
           <div class="event-meta"></div>
-          <div class="event-flags"></div>
         </div>
         <div class="event-actions">
-          <button type="button" class="mini-button done-button">完了</button>
           <button type="button" class="mini-button edit-button">編集</button>
           <button type="button" class="mini-button danger delete-button">削除</button>
         </div>
       </article>
     </template>
 
-    <script type="module" src="./app.js"></script>
+    <script type="module" src="./app.js?v=4"></script>
   </body>
 </html>
