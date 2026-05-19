@@ -456,13 +456,13 @@ label textarea {
 }
 
 .event-item.category-off {
-  border-left-color: #60745a;
-  background: linear-gradient(90deg, rgba(96, 116, 90, 0.09), #fff 34%);
+  border-left-color: #b9473e;
+  background: linear-gradient(90deg, rgba(185, 71, 62, 0.1), #fff 34%);
 }
 
 .event-item.category-use {
-  border-left-color: #b9473e;
-  background: linear-gradient(90deg, rgba(185, 71, 62, 0.08), #fff 34%);
+  border-left-color: #6d6095;
+  background: linear-gradient(90deg, rgba(109, 96, 149, 0.09), #fff 34%);
 }
 
 .event-item.category-other {
@@ -542,14 +542,14 @@ label textarea {
 
 .category-off .event-category,
 .chip.off {
-  background: #eef3ec;
-  color: #4f634a;
+  background: #ffe7e4;
+  color: #9b3a33;
 }
 
 .category-use .event-category,
 .chip.use {
-  background: #fff0ed;
-  color: #9b3a33;
+  background: #f0eef8;
+  color: #5a4f7d;
 }
 
 .category-other .event-category,
@@ -609,7 +609,7 @@ label textarea {
   display: grid;
   align-content: start;
   gap: 5px;
-  min-height: 74px;
+  min-height: 88px;
   padding: 7px 5px;
   overflow: hidden;
   text-align: left;
@@ -628,6 +628,19 @@ label textarea {
 .day-cell.is-selected {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
+}
+
+.day-cell.has-off {
+  border-color: rgba(185, 71, 62, 0.48);
+  background: #fff0ed;
+}
+
+.day-cell.has-off .day-number {
+  color: #9b3a33;
+}
+
+.day-cell.has-off.is-selected {
+  outline-color: #b9473e;
 }
 
 .day-number {
@@ -655,11 +668,41 @@ label textarea {
   background: #edf3ee;
   color: var(--primary-dark);
   padding: 3px 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (max-width: 719px) {
+  #calendarView.view-panel.is-active {
+    gap: 10px;
+  }
+
+  #calendarView .calendar-wrap {
+    margin-inline: -14px;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    padding: 4px 2px;
+  }
+
+  #calendarView .calendar-grid,
+  #calendarView .calendar-wrap {
+    gap: 1px;
+  }
+
+  #calendarView .day-cell {
+    min-height: 104px;
+    padding: 5px 2px;
+  }
+
+  #calendarView .chip {
+    padding: 2px 3px;
+    font-size: 9px;
+    line-height: 1.2;
+  }
 }
 
 form {

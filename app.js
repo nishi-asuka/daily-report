@@ -7,7 +7,7 @@ const categoryLabels = {
   meal: "食事会",
   lecturer: "外部講師",
   off: "休み",
-  use: "使用",
+  use: "私用",
   other: "その他"
 };
 
@@ -251,6 +251,7 @@ function renderCalendar() {
     });
 
     const dayEvents = eventsForDate(dateKey);
+    if (dayEvents.some((item) => item.category === "off")) cell.classList.add("has-off");
     cell.innerHTML = `
       <span class="day-number">
         <span>${date.getDate()}</span>
@@ -263,7 +264,7 @@ function renderCalendar() {
     dayEvents.slice(0, 3).forEach((item) => {
       const chip = document.createElement("span");
       chip.className = `chip ${item.category}`;
-      chip.textContent = `${formatTimeRange(item)} ${item.title}`.trim();
+      chip.textContent = item.title;
       eventWrap.appendChild(chip);
     });
     els.calendarGrid.appendChild(cell);
@@ -483,7 +484,7 @@ function inferCategoryFromText(text) {
   if (/食事|会食|ランチ|夕食|懇親/.test(text)) return "meal";
   if (/講師|研修|セミナー|勉強会/.test(text)) return "lecturer";
   if (/休み|休暇|有休|休日/.test(text)) return "off";
-  if (/使用|利用|予約|式場|会議室/.test(text)) return "use";
+  if (/私用|プライベート|個人|美容|ヘアカット/.test(text)) return "use";
   return "other";
 }
 
@@ -540,7 +541,7 @@ function mapCategory(category, title = "", notes = "") {
   if (category === "travel") return "travel";
   if (category === "customer" || category === "meeting") return "visitor";
   if (category === "personal") return "off";
-  if (category === "branch") return "use";
+  if (category === "branch") return "other";
   const inferred = inferCategoryFromText(`${title} ${notes}`);
   return inferred === "other" ? "other" : inferred;
 }
@@ -548,6 +549,10 @@ function mapCategory(category, title = "", notes = "") {
 function addSampleEvents() {
   const today = toDateKey(new Date());
   const tomorrow = toDateKey(addDays(new Date(), 1));
+  const dayAfterTomorrow = toDateKey(addDays(new Date(), 2));
+  const threeDaysLater = toDateKey(addDays(new Date(), 3));
+  const fourDaysLater = toDateKey(addDays(new Date(), 4));
+  const fiveDaysLater = toDateKey(addDays(new Date(), 5));
   state.events = [
     ...state.events,
     {
@@ -563,13 +568,79 @@ function addSampleEvents() {
     },
     {
       id: crypto.randomUUID(),
-      title: "外部講師との打合せ",
+      title: "京都出張",
+      date: today,
+      allDay: false,
+      start: "13:00",
+      end: "17:00",
+      category: "travel",
+      notes: "移動時間を確保",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "食事会",
       date: tomorrow,
+      allDay: false,
+      start: "12:00",
+      end: "13:30",
+      category: "meal",
+      notes: "予約確認",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "外部講師",
+      date: tomorrow,
+      allDay: false,
+      start: "15:00",
+      end: "16:00",
+      category: "lecturer",
+      notes: "資料と投影環境を確認",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "休み",
+      date: dayAfterTomorrow,
+      allDay: true,
+      start: "",
+      end: "",
+      category: "off",
+      notes: "終日休み",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "私用の予定",
+      date: threeDaysLater,
       allDay: false,
       start: "14:00",
       end: "15:00",
-      category: "lecturer",
-      notes: "資料と投影環境を確認",
+      category: "use",
+      notes: "移動時間を確認",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "その他確認",
+      date: fourDaysLater,
+      allDay: false,
+      start: "16:00",
+      end: "16:30",
+      category: "other",
+      notes: "未分類の予定",
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: crypto.randomUUID(),
+      title: "来客準備",
+      date: fiveDaysLater,
+      allDay: false,
+      start: "09:30",
+      end: "10:00",
+      category: "visitor",
+      notes: "資料を印刷",
       updatedAt: new Date().toISOString()
     }
   ];
