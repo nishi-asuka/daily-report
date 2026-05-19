@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icons/icon-180.png" />
-    <link rel="stylesheet" href="./styles.css?v=7" />
+    <link rel="stylesheet" href="./styles.css?v=11" />
   </head>
   <body>
     <div class="app-shell">
@@ -76,10 +76,11 @@
                 <span>カテゴリ</span>
                 <select id="filterCategoryInput">
                   <option value="all">すべて</option>
+                  <option value="meeting">会議</option>
                   <option value="travel">出張</option>
                   <option value="visitor">来客</option>
                   <option value="meal">食事会</option>
-                  <option value="lecturer">外部講師</option>
+                  <option value="lecturer">研修</option>
                   <option value="off">休み</option>
                   <option value="use">私用</option>
                   <option value="other">その他</option>
@@ -165,11 +166,11 @@
               <div class="field-row time-row">
                 <label>
                   <span>開始</span>
-                  <input id="startInput" type="time" />
+                  <select id="startInput"></select>
                 </label>
                 <label>
                   <span>終了</span>
-                  <input id="endInput" type="time" />
+                  <select id="endInput"></select>
                 </label>
               </div>
 
@@ -177,10 +178,11 @@
                 <label>
                   <span>カテゴリ</span>
                   <select id="categoryInput">
+                    <option value="meeting">会議</option>
                     <option value="travel">出張</option>
                     <option value="visitor">来客</option>
                     <option value="meal">食事会</option>
-                    <option value="lecturer">外部講師</option>
+                    <option value="lecturer">研修</option>
                     <option value="off">休み</option>
                     <option value="use">私用</option>
                     <option value="other">その他</option>
@@ -240,6 +242,6 @@
       </article>
     </template>
 
-    <script type="module" src="./app.js?v=7"></script>
+    <script type="module" src="./app.js?v=11"></script>
   </body>
 </html>

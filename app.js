@@ -1,11 +1,15 @@
 const STORAGE_KEY = "personal-schedule-events-v3";
 const LEGACY_STORAGE_KEYS = ["personal-schedule-events-v2", "personal-schedule-events-v1"];
+const TIME_STEP_MINUTES = 30;
+const TIME_START_HOUR = 6;
+const TIME_END_HOUR = 22;
 
 const categoryLabels = {
+  meeting: "会議",
   travel: "出張",
   visitor: "来客",
   meal: "食事会",
-  lecturer: "外部講師",
+  lecturer: "研修",
   off: "休み",
   use: "私用",
   other: "その他"
@@ -49,6 +53,7 @@ const els = {
   eventTemplate: document.querySelector("#eventTemplate")
 };
 
+initializeTimeSelects();
 bindEvents();
 registerServiceWorker();
 resetForm();
@@ -106,6 +111,7 @@ function bindEvents() {
 
   [els.dateInput, els.startInput, els.endInput, els.allDayInput].forEach((input) => {
     input.addEventListener("input", updateConflictWarning);
+    input.addEventListener("change", updateConflictWarning);
   });
 
   els.allDayInput.addEventListener("change", () => {
@@ -154,6 +160,42 @@ function registerServiceWorker() {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => undefined);
   });
+}
+
+function initializeTimeSelects() {
+  [els.startInput, els.endInput].forEach((select) => {
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "未指定";
+    select.append(emptyOption);
+
+    for (let totalMinutes = TIME_START_HOUR * 60; totalMinutes <= TIME_END_HOUR * 60; totalMinutes += TIME_STEP_MINUTES) {
+      const hour = Math.floor(totalMinutes / 60);
+      const minute = totalMinutes % 60;
+      const value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      select.append(option);
+    }
+  });
+}
+
+function clearExistingTimeOptions() {
+  [els.startInput, els.endInput].forEach((select) => {
+    [...select.options]
+      .filter((option) => option.dataset.existing === "true")
+      .forEach((option) => option.remove());
+  });
+}
+
+function ensureTimeOption(select, value) {
+  if (!value || [...select.options].some((option) => option.value === value)) return;
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = `${value}（既存）`;
+  option.dataset.existing = "true";
+  select.append(option);
 }
 
 function setActiveView(view) {
@@ -356,10 +398,13 @@ function saveCurrentForm() {
 function editEvent(id) {
   const item = state.events.find((event) => event.id === id);
   if (!item) return;
+  clearExistingTimeOptions();
   els.eventId.value = item.id;
   els.titleInput.value = item.title;
   els.dateInput.value = item.date;
   els.allDayInput.checked = item.allDay;
+  ensureTimeOption(els.startInput, item.start);
+  ensureTimeOption(els.endInput, item.end);
   els.startInput.value = item.start;
   els.endInput.value = item.end;
   els.categoryInput.value = item.category;
@@ -378,6 +423,7 @@ function deleteEvent(id) {
 }
 
 function resetForm(overrides = {}) {
+  clearExistingTimeOptions();
   els.eventForm.reset();
   els.eventId.value = "";
   els.titleInput.value = overrides.title || "";
@@ -479,6 +525,7 @@ function parseJapaneseMemo(text) {
 }
 
 function inferCategoryFromText(text) {
+  if (/会議|打合せ|打ち合わせ|ミーティング|面談/.test(text)) return "meeting";
   if (/出張|遠方|移動/.test(text)) return "travel";
   if (/来客|来社|訪問者|お客様/.test(text)) return "visitor";
   if (/食事|会食|ランチ|夕食|懇親/.test(text)) return "meal";
@@ -539,7 +586,8 @@ function normalizeEvent(item) {
 function mapCategory(category, title = "", notes = "") {
   if (categoryLabels[category]) return category;
   if (category === "travel") return "travel";
-  if (category === "customer" || category === "meeting") return "visitor";
+  if (category === "customer") return "visitor";
+  if (category === "meeting") return "meeting";
   if (category === "personal") return "off";
   if (category === "branch") return "other";
   const inferred = inferCategoryFromText(`${title} ${notes}`);
@@ -590,7 +638,7 @@ function addSampleEvents() {
     },
     {
       id: crypto.randomUUID(),
-      title: "外部講師",
+      title: "研修",
       date: tomorrow,
       allDay: false,
       start: "15:00",

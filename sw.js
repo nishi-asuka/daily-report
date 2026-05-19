@@ -1,11 +1,11 @@
-const CACHE_NAME = "personal-schedule-v7";
+const CACHE_NAME = "personal-schedule-v11";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
-  "./styles.css?v=7",
+  "./styles.css?v=11",
   "./app.js",
-  "./app.js?v=7",
+  "./app.js?v=11",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/icon-180.png",
